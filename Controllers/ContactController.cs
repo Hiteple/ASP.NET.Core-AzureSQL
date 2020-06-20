@@ -26,6 +26,50 @@ namespace api_sql_platzi.Controllers
             // ToList returns an array in json format for objects
             return _contactsContext.ContactSet.ToList();
         }
+
+        [HttpGet("{id}")]
+        public ActionResult<Contacts> Get(string id)
+        {
+            var selectedContact = (from c in _contactsContext.ContactSet
+                where c.Id == id
+                select c).FirstOrDefault();
+
+            return selectedContact;
+        }
+
+        [HttpPost]
+        public IActionResult Post([FromBody] Contacts value)
+        {
+            Contacts newContact = value;
+            _contactsContext.ContactSet.Add(newContact);
+            _contactsContext.SaveChanges();
+            return Ok("Contact added!");
+        }
+
+        [HttpPut("{id}")]
+        public void Put(string id, [FromBody] Contacts value)
+        {
+            var selectedElement = (from c in _contactsContext.ContactSet
+                where c.Id == id
+                select c).FirstOrDefault();
+            if (selectedElement != null)
+            {
+                selectedElement.Name = value.Name;
+                selectedElement.Email = value.Email;
+                selectedElement.Phone = value.Phone;
+                _contactsContext.SaveChanges();
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(string id)
+        {
+            var selectedElement = _contactsContext.ContactSet.Find(id);
+            _contactsContext.ContactSet.Remove(selectedElement);
+            _contactsContext.SaveChanges();
+            
+            return Ok("Deleted correctly!");
+        }
         
         // 4 - Destructure
         ~ContactController()
